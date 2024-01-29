@@ -1,5 +1,6 @@
 # Редактор блок схем на vue 3
 
+npm 18 version
 
 ## Project setup
 ```

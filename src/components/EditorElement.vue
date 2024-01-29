@@ -1,7 +1,20 @@
 <template>
-    <div :style="dynamicStyle" draggable="false" :class="dynamicClass">
+    <div @contextmenu.prevent="showContextMenu($event)" :style="dynamicStyle" draggable="false" :class="dynamicClass">
         <div v-if="DynamicSelect">
             <div v-for="(point, index) in getUpperPointCoordinate" draggable="true" class="resize-point" :key="index" :id="point.id" :style="point.style" @dragend="point.dragend"></div>
+        </div>
+        <p contenteditable ref="editableP" @input="handleInput">{{ EditedData.text_ }}</p>
+
+        <!-- Контекстное меню -->
+        <div v-if="menu.contextMenuVisible" class="context-menu" :style="dynamicMenu">
+            <ul class="list-group">
+                <button class="list-group-item list-group-item-action">Удалить блок</button>
+                <button class="list-group-item list-group-item-action">Копировать</button>
+                <label class="list-group-item">
+                    <input class="form-check-input" type="checkbox" v-model="hasFill"> Есть заливка
+                </label>
+                <button class="list-group-item list-group-item-action" @click="chooseColor">Выбрать цвет</button>
+            </ul>
         </div>
     </div>
 </template>
@@ -23,7 +36,14 @@
     border-width: 3px 3px 3px 3px;
     background-color: #55a;
     position: absolute;
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
 }
+
+
 .squadre:hover {
     outline: 1px solid aquamarine;
 }
@@ -46,6 +66,18 @@
     outline: 1px solid aquamarine;
     cursor: all-scroll;
 }
+
+
+.context-menu {
+    width: 10rem;
+    font-size: 0.7rem;
+    position: absolute;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    padding: 5px;
+    z-index: 1000;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
 </style>
 
 <script>
@@ -55,12 +87,18 @@ export default {
     props: {
         data_: Object,
         editElement: Function,
-        ElementIndex: Number
+        ElementIndex: Number,
     },
 
     data() {
         return {
             EditedData: this.data_,
+            menu: {
+                contextMenuVisible: false,
+                contextMenuTop: 0,
+                contextMenuLeft: 0,
+                hasFill: false
+            }
         }
     },
     computed: {
@@ -88,6 +126,13 @@ export default {
         },
         DynamicSelect() {
             return this.data_.selected
+        },
+        dynamicMenu() {
+            // Положение меню
+            return {
+                left: this.menu.contextMenuLeft - this.EditedData.left + "px",
+                top: this.menu.contextMenuTop - this.EditedData.top + "px",
+            }
         },
         getUpperPointCoordinate() {
             /**
@@ -122,6 +167,11 @@ export default {
             // Вызываем метод из родительского компонента для обновления данных
             this.editElement(this.ElementIndex, this.EditedData);
         },
+        /**
+         * 
+         * Кнопки управления размерами блока
+         * 
+         * */
         upperResize() {
             const stopPosition = event.clientY
             // Нижняя точка фигуры
@@ -136,7 +186,7 @@ export default {
             }
             this.saveChanges()
         },
-        bottResize(){
+        bottResize() {
             const stopPosition = event.clientY
             if (stopPosition < this.EditedData.top) {
                 this.EditedData.height = this.EditedData.top - stopPosition
@@ -168,6 +218,37 @@ export default {
             else {
                 this.EditedData.width = stopPosition - this.EditedData.left
             }
+        },
+
+        showContextMenu(event) {
+            // Показываем контекстное меню
+            this.menu.contextMenuVisible = true;
+
+            // Устанавливаем позицию контекстного меню
+            this.menu.contextMenuTop = event.clientY;
+            this.menu.contextMenuLeft = event.clientX;
+
+            console.log(event.clientY, event.clientX)
+
+            // Закрываем контекстное меню при клике вне него
+            const closeMenu = () => {
+                this.menu.contextMenuVisible = false;
+                window.removeEventListener('click', closeMenu);
+            };
+
+            window.addEventListener('click', closeMenu);
+
+            // Предотвращаем стандартное контекстное меню браузера
+            event.preventDefault();
+        },
+        closeContextMenu() {
+            // Закрываем контекстное меню при клике вне него
+            this.menu.contextMenuVisible = false;
+        },
+        handleInput() {
+            // Обработка изменений в редактируемом теге p
+            const editedText = this.$refs.editableP.innerText;
+            console.log('Изменения:', editedText);
         }
     }
 

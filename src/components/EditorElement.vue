@@ -1,9 +1,10 @@
 <template>
     <div @contextmenu.prevent="showContextMenu($event)" :style="dynamicStyle" draggable="false" :class="dynamicClass">
+        <SvgElement :data_="data_"/>
         <div v-if="DynamicSelect">
             <div v-for="(point, index) in getUpperPointCoordinate" draggable="true" class="resize-point" :key="index" :id="point.id" :style="point.style" @dragend="point.dragend"></div>
         </div>
-        <p contenteditable ref="editableP" @input="handleInput">{{ EditedData.text_ }}</p>
+        <!-- <p contenteditable ref="editableP" @input="handleInput">{{ }}</p> -->
 
         <!-- Контекстное меню -->
         <div v-if="menu.contextMenuVisible" class="context-menu" :style="dynamicMenu">
@@ -31,25 +32,25 @@
 }
 
 .squadre {
-    border: solid #333;
+    /* border: solid #333;
     border-radius: 5px;
     border-width: 3px 3px 3px 3px;
-    background-color: #55a;
+    background-color: #55a; */
     position: absolute;
-    display: flex;
+    /* display: flex; */
 
-    align-items: center;
-    justify-content: center;
+    /* align-items: center;
+    justify-content: center; */
 
 }
 
 
 .squadre:hover {
-    outline: 1px solid aquamarine;
+    outline: 2px solid aquamarine;
 }
 
 .selected {
-    border: dotted #333;
+    outline: dotted #333;
 }
 
 .resize-point {
@@ -81,6 +82,8 @@
 </style>
 
 <script>
+import SvgElement from './SvgElement.vue'
+
 
 export default {
     name: 'EditorElement',
@@ -88,6 +91,9 @@ export default {
         data_: Object,
         editElement: Function,
         ElementIndex: Number,
+    },
+    components:{
+        SvgElement
     },
 
     data() {
@@ -118,10 +124,10 @@ export default {
              * Отвечает за положение и размер обьекта
              */
             return {
-                left: this.EditedData.left + "px",
-                top: this.EditedData.top + "px",
-                width: this.EditedData.width + "px",
-                height: this.EditedData.height + "px",
+                left: this.EditedData.left -2 + "px",
+                top: this.EditedData.top -2 + "px",
+                width: this.EditedData.width +2 + "px",
+                height: this.EditedData.height +2 + "px",
             }
         },
         DynamicSelect() {

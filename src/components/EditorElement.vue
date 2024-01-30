@@ -1,6 +1,6 @@
 <template>
-    <div @contextmenu.prevent="showContextMenu($event)" :style="dynamicStyle" draggable="false" :class="dynamicClass">
-        <SvgElement :data_="data_"/>
+    <div ref="ElementBoard" @contextmenu.prevent="showContextMenu($event)" :style="dynamicStyle" draggable="true" @mousedown="startDrag" @mouseup="stopDrag" :class="dynamicClass">
+        <SvgElement :data_="data_" />
         <div v-if="DynamicSelect">
             <div v-for="(point, index) in getUpperPointCoordinate" draggable="true" class="resize-point" :key="index" :id="point.id" :style="point.style" @dragend="point.dragend"></div>
         </div>
@@ -21,27 +21,8 @@
 </template>
 
 <style>
-.circle {
-    width: 50px;
-    height: 50px;
-    border: solid #333;
-    border-radius: 50px;
-    border-width: 3px 3px 3px 3px;
-    background-color: cadetblue;
-    position: absolute;
-}
-
 .squadre {
-    /* border: solid #333;
-    border-radius: 5px;
-    border-width: 3px 3px 3px 3px;
-    background-color: #55a; */
     position: absolute;
-    /* display: flex; */
-
-    /* align-items: center;
-    justify-content: center; */
-
 }
 
 
@@ -92,7 +73,7 @@ export default {
         editElement: Function,
         ElementIndex: Number,
     },
-    components:{
+    components: {
         SvgElement
     },
 
@@ -104,7 +85,10 @@ export default {
                 contextMenuTop: 0,
                 contextMenuLeft: 0,
                 hasFill: false
-            }
+            },
+            isDragging: false,
+            initialMouseX: 0,
+            initialMouseY: 0,
         }
     },
     computed: {
@@ -124,10 +108,10 @@ export default {
              * Отвечает за положение и размер обьекта
              */
             return {
-                left: this.EditedData.left -2 + "px",
-                top: this.EditedData.top -2 + "px",
-                width: this.EditedData.width +2 + "px",
-                height: this.EditedData.height +2 + "px",
+                left: this.EditedData.left - 2 + "px",
+                top: this.EditedData.top - 2 + "px",
+                width: this.EditedData.width + 2 + "px",
+                height: this.EditedData.height + 2 + "px",
             }
         },
         DynamicSelect() {
@@ -173,6 +157,37 @@ export default {
             // Вызываем метод из родительского компонента для обновления данных
             this.editElement(this.ElementIndex, this.EditedData);
         },
+
+        // Перетаскивание элемента
+        startDrag(event) {
+            if (this.data_.selected) {
+                this.isDragging = true;
+                this.initialMouseX = event.clientX;
+                this.initialMouseY = event.clientY;
+                this.initialElementX = this.$refs.ElementBoard.offsetLeft
+                this.initialElementY = this.$refs.ElementBoard.offsetTop;
+
+                document.addEventListener('mousemove', this.handleMouseMove);
+                document.addEventListener('mouseup', this.stopDrag);
+            }
+        },
+        handleMouseMove(event) {
+            if (this.isDragging) {
+                const deltaX = event.clientX - this.initialMouseX;
+                const deltaY = event.clientY - this.initialMouseY;
+
+                this.EditedData.left = this.initialElementX + deltaX;
+                this.EditedData.top = this.initialElementY + deltaY;
+
+                this.saveChanges()
+            }
+        },
+        stopDrag() {
+            this.isDragging = false;
+            document.removeEventListener('mousemove', this.handleMouseMove);
+            document.removeEventListener('mouseup', this.stopDrag);
+        },
+
         /**
          * 
          * Кнопки управления размерами блока

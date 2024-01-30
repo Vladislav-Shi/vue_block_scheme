@@ -68,8 +68,8 @@ export default {
           left: x,
           top: y,
           selected: false,
-          width: 70,
-          height: 50,
+          width: 120,
+          height: 70,
           text_: 'простой блок'
         }
       )

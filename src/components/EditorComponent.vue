@@ -70,7 +70,10 @@ export default {
           selected: false,
           width: 120,
           height: 70,
-          text_: 'простой блок'
+          text_: 'простой блок',
+          hasFill: true,
+          borderColor: "hsl( 0, 100%, 50% )",
+          fillColor: "hsl( 0, 100%, 75% )"
         }
       )
     },

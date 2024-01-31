@@ -12,7 +12,7 @@
                 <button class="list-group-item list-group-item-action">Удалить блок</button>
                 <button class="list-group-item list-group-item-action">Копировать</button>
                 <label class="list-group-item">
-                    <input class="form-check-input" type="checkbox" v-model="hasFill"> Есть заливка
+                    <input class="form-check-input" type="checkbox" v-model="EditedData.hasFill" @change="ChangeFill"> Есть заливка
                 </label>
                 <button class="list-group-item list-group-item-action" @click="chooseColor">Выбрать цвет</button>
             </ul>
@@ -84,7 +84,6 @@ export default {
                 contextMenuVisible: false,
                 contextMenuTop: 0,
                 contextMenuLeft: 0,
-                hasFill: false
             },
             isDragging: false,
             initialMouseX: 0,
@@ -270,6 +269,11 @@ export default {
             // Обработка изменений в редактируемом теге p
             const editedText = this.$refs.editableP.innerText;
             console.log('Изменения:', editedText);
+        },
+
+        ChangeFill(){
+            // Меняет режим заливки
+            this.saveChanges()
         }
     }
 

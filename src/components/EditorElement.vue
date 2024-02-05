@@ -7,16 +7,8 @@
         <!-- <p contenteditable ref="editableP" @input="handleInput">{{ }}</p> -->
 
         <!-- Контекстное меню -->
-        <div v-if="menu.contextMenuVisible" class="context-menu" :style="dynamicMenu">
-            <ul class="list-group">
-                <button class="list-group-item list-group-item-action">Удалить блок</button>
-                <button class="list-group-item list-group-item-action">Копировать</button>
-                <label class="list-group-item">
-                    <input class="form-check-input" type="checkbox" v-model="EditedData.hasFill" @change="ChangeFill"> Есть заливка
-                </label>
-                <button class="list-group-item list-group-item-action" @click="chooseColor">Выбрать цвет</button>
-            </ul>
-        </div>
+        <ElementMenuComponent v-if="menu.contextMenuVisible" :ElementIndex="ElementIndex" :menu="menu">
+        </ElementMenuComponent>
     </div>
 </template>
 
@@ -48,22 +40,11 @@
     outline: 1px solid aquamarine;
     cursor: all-scroll;
 }
-
-
-.context-menu {
-    width: 10rem;
-    font-size: 0.7rem;
-    position: absolute;
-    background-color: #fff;
-    border: 1px solid #ccc;
-    padding: 5px;
-    z-index: 1000;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-}
 </style>
 
 <script>
 import SvgElement from './SvgElement.vue'
+import ElementMenuComponent from './ElementMenuComponent.vue'
 
 
 export default {
@@ -72,7 +53,8 @@ export default {
         ElementIndex: Number,
     },
     components: {
-        SvgElement
+        SvgElement,
+        ElementMenuComponent
     },
 
     data() {
@@ -117,13 +99,7 @@ export default {
         DynamicSelect() {
             return this.EditedData.selected
         },
-        dynamicMenu() {
-            // Положение меню
-            return {
-                left: this.menu.contextMenuLeft - this.EditedData.left + "px",
-                top: this.menu.contextMenuTop - this.EditedData.top + "px",
-            }
-        },
+
         getUpperPointCoordinate() {
             /**
              * Координаты верхней точки для редактирования
@@ -266,26 +242,10 @@ export default {
             // Закрываем контекстное меню при клике вне него
             this.menu.contextMenuVisible = false;
         },
-        handleInput() {
-            // Обработка изменений в редактируемом теге p
-            const editedText = this.$refs.editableP.innerText;
-            console.log('Изменения:', editedText);
-        },
-
-        ChangeFill(){
-            // Меняет режим заливки
-            console.log('ChangeFill')
-            this.saveChanges()
-        }
     },
     created(){
-        console.log('created EditedData=', this.getData)
         this.EditedData = this.getData
     },
-    // beforeUpdate() {
-    //     console.log('beforeUpdate EditedData=', this.$store.state.elements[this.ElementIndex], this.EditedData)
-    //     this.EditedData = this.$store.state.elements[this.ElementIndex]
-    // },
 
 }
 </script>

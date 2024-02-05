@@ -14,15 +14,19 @@
 <script>
 export default {
     name: 'ElementMenuComponent',
-    props: {},
+    props: {
+        ElementIndex: Number,
+        menu: Object
+    },
     data() {
         return {
-            contextMenuVisible: false,
-            contextMenuTop: 0,
-            contextMenuLeft: 0,
+            EditedData: null,
         }
     },
     computed: {
+        getData() {
+            return this.$store.state.elements[this.ElementIndex]
+        },
         dynamicMenu() {
             // Положение меню
             return {
@@ -32,9 +36,23 @@ export default {
         },
     },
     methods: {
-        
-    }
-    
+        saveChanges() {
+            // Вызываем метод из родительского компонента для обновления данных
+            this.$store.commit('changeElement', { 'index': this.ElementIndex, 'newData': this.EditedData })
+        },
+
+        ChangeFill(){
+            // Меняет режим заливки
+            console.log('ChangeFill')
+            this.saveChanges()
+        }
+
+    },
+    created() {
+        console.log('element menu', this.ElementIndex)
+        this.EditedData = this.getData
+    },
+
 }
 </script>
 
@@ -48,5 +66,6 @@ export default {
     padding: 5px;
     z-index: 1000;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    position: absolute;
 }
 </style>

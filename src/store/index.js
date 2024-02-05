@@ -28,8 +28,6 @@ const store = createStore({
       });
     },
     setFocusElement(state, index){
-      console.log('focus store', index, state.focusElement)
-      console.log('state.elements', state.elements)
       if (state.focusElement != null){
         state.elements[state.focusElement].selected = false
       }

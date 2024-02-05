@@ -1,6 +1,6 @@
 <template>
     <div ref="ElementBoard" @contextmenu.prevent="showContextMenu($event)" :style="dynamicStyle" draggable="true" @mousedown="startDrag" @mouseup="stopDrag" :class="dynamicClass">
-        <SvgElement :data_="data_" />
+        <SvgElement :data_="EditedData" />
         <div v-if="DynamicSelect">
             <div v-for="(point, index) in getUpperPointCoordinate" draggable="true" class="resize-point" :key="index" :id="point.id" :style="point.style" @dragend="point.dragend"></div>
         </div>
@@ -69,8 +69,6 @@ import SvgElement from './SvgElement.vue'
 export default {
     name: 'EditorElement',
     props: {
-        data_: Object,
-        editElement: Function,
         ElementIndex: Number,
     },
     components: {
@@ -79,7 +77,7 @@ export default {
 
     data() {
         return {
-            EditedData: this.data_,
+            EditedData: null,
             menu: {
                 contextMenuVisible: false,
                 contextMenuTop: 0,
@@ -91,15 +89,18 @@ export default {
         }
     },
     computed: {
+        getData(){
+            return this.$store.state.elements[this.ElementIndex]
+        },
         dynamicClass() {
             /**
              * Метод отвечает за отрисовку класса обьекта
              */
             let class_ = []
-            if (this.data_.selected) {
+            if (this.EditedData.selected) {
                 class_.push('selected')
             }
-            class_.push(this.data_.class_)
+            class_.push(this.EditedData.class_)
             return class_;
         },
         dynamicStyle() {
@@ -114,7 +115,7 @@ export default {
             }
         },
         DynamicSelect() {
-            return this.data_.selected
+            return this.EditedData.selected
         },
         dynamicMenu() {
             // Положение меню
@@ -154,12 +155,12 @@ export default {
     methods: {
         saveChanges() {
             // Вызываем метод из родительского компонента для обновления данных
-            this.editElement(this.ElementIndex, this.EditedData);
+            this.$store.commit('changeElement', {'index':this.ElementIndex, 'newData': this.EditedData})
         },
 
         // Перетаскивание элемента
         startDrag(event) {
-            if (this.data_.selected) {
+            if (this.EditedData.selected) {
                 this.isDragging = true;
                 this.initialMouseX = event.clientX;
                 this.initialMouseY = event.clientY;
@@ -273,9 +274,18 @@ export default {
 
         ChangeFill(){
             // Меняет режим заливки
+            console.log('ChangeFill')
             this.saveChanges()
         }
-    }
+    },
+    created(){
+        console.log('created EditedData=', this.getData)
+        this.EditedData = this.getData
+    },
+    // beforeUpdate() {
+    //     console.log('beforeUpdate EditedData=', this.$store.state.elements[this.ElementIndex], this.EditedData)
+    //     this.EditedData = this.$store.state.elements[this.ElementIndex]
+    // },
 
 }
 </script>

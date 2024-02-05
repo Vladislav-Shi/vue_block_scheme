@@ -1,16 +1,23 @@
-import Vuex from "vuex";
+import { createStore } from "vuex";
 
-const store = new Vuex.Store({
-  state: {
-    elements: [],
+const store = createStore({
+  state() {
+    return {
+      elements: [],
+      focusElement: null
+    };
   },
+  getters: {
+    hasFocused: state => {return state.focusElement != null}
+  },
+
   mutations: {
-    addRectangle(state, left, top) {
-    // Добавить прямоугольник в список элементов
+    addRectangle(state, payload) {
+      // Добавить прямоугольник в список элементов
       state.elements.push({
         class_: "squadre",
-        left: left,
-        top: top,
+        left: payload.left_,
+        top: payload.top_,
         selected: false,
         width: 120,
         height: 70,
@@ -20,19 +27,29 @@ const store = new Vuex.Store({
         fillColor: "hsl( 0, 100%, 75% )",
       });
     },
-    deleteElement(state, index){
-        // удалить элемент по индексу
-        state.elements.splice(index, 1)
+    setFocusElement(state, index){
+      console.log('focus store', index, state.focusElement)
+      console.log('state.elements', state.elements)
+      if (state.focusElement != null){
+        state.elements[state.focusElement].selected = false
+      }
+      state.focusElement = index
+      state.elements[index].selected = true
     },
-    addElements(state, elements){
-        // добавляет элементы. Служит для загрузки старых блок-схем
-        state.elements = elements
+
+    deleteElement(state, index) {
+      // удалить элемент по индексу
+      state.elements.splice(index, 1);
+      state.focusElement = null
     },
-    changeElement(state, index, newData){
-        state.elements[index] = newData
-    }
+    loadElements(state, elements) {
+      // добавляет элементы. Служит для загрузки старых блок-схем
+      state.elements = elements;
+    },
+    changeElement(state, indexAndnewData) {
+      state.elements[indexAndnewData.index] = indexAndnewData.newData;
+    },
   },
-  getters: {},
 });
 
 export default store;

@@ -2,7 +2,11 @@
   <div>
     <h2>Поле редактирования</h2>
     <div @drop="paintFigure" id="editorField" @dragover="allowDrop">
-      <EditorElement v-for="(item, index) in editorElements" draggable="false" @dblclick="ElementFocus(index)" :key="index" :editElement="editElement" :data_="item" />
+      <EditorElement v-for="(item, index) in getData"
+                                                                                                                                                                                                                                                                          draggable="false"
+                                                                                                                                                                                                                                                                          @dblclick="ElementFocus(index)"
+                                                                                                                                                                                                                                                                          :key="index"
+                                                                                                                                                                                                                                                                          :ElementIndex="index" />
     </div>
 
   </div>
@@ -30,8 +34,14 @@ export default {
   name: 'EditorComponent',
   data() {
     return {
-      editorElements: [],
+      // editorElements: [],
       focusElement: null
+    }
+  },
+  computed:
+  {
+    getData() {
+      return this.$store.state.elements
     }
   },
   components: {
@@ -62,35 +72,14 @@ export default {
 
       console.log("Элемент отпущен по координатам: X=" + x + ", Y=" + y)
 
-      this.$data.editorElements.push(
-        {
-          class_: "squadre",
-          left: x,
-          top: y,
-          selected: false,
-          width: 120,
-          height: 70,
-          text_: 'простой блок',
-          hasFill: true,
-          borderColor: "hsl( 0, 100%, 50% )",
-          fillColor: "hsl( 0, 100%, 75% )"
-        }
-      )
+      this.$store.commit('addRectangle', {'left_':x, 'top_': y})
     },
 
     ElementFocus(index) {
       console.log('focus')
-      if (this.focusElement != null) {
-        this.editorElements[this.focusElement].selected = false
-      }
-      this.focusElement = index
-      this.editorElements[this.focusElement].selected = true
+      this.$store.commit('setFocusElement', index)
+    },
 
-    },
-    editElement(index, updatedData) {
-      // Обновляем данные по индексу
-      this.editorElements[index] = updatedData
-    },
     handleKeyDown() {
       // Проверяем, что была нажата клавиша "Delete" и элемент выбран
       if (event.key === 'Delete') {
@@ -98,8 +87,9 @@ export default {
       }
     },
     deleteElement() {
-      this.editorElements.splice(this.focusElement, 1);
-      this.focusElement = null
+      if (this.$store.getters.hasFocused) {
+        this.$store.commit('deleteElement', this.$store.state.focusElement)
+      }
     }
   }
 }

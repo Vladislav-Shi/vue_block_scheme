@@ -71,7 +71,7 @@ export default {
         }
     },
     computed: {
-        getData(){
+        getData() {
             return this.$store.state.elements[this.ElementIndex]
         },
         dynamicClass() {
@@ -131,7 +131,7 @@ export default {
     methods: {
         saveChanges() {
             // Вызываем метод из родительского компонента для обновления данных
-            this.$store.commit('changeElement', {'index':this.ElementIndex, 'newData': this.EditedData})
+            this.$store.commit('changeElement', { 'index': this.ElementIndex, 'newData': this.EditedData })
         },
 
         // Перетаскивание элемента
@@ -224,26 +224,25 @@ export default {
             // Устанавливаем позицию контекстного меню
             this.menu.contextMenuTop = event.clientY;
             this.menu.contextMenuLeft = event.clientX;
-
-            console.log(event.clientY, event.clientX)
-
             // Закрываем контекстное меню при клике вне него
-            const closeMenu = () => {
-                this.menu.contextMenuVisible = false;
-                window.removeEventListener('click', closeMenu);
-            };
 
-            window.addEventListener('click', closeMenu);
+            window.addEventListener('click', this.closeContextMenu);
 
             // Предотвращаем стандартное контекстное меню браузера
             event.preventDefault();
         },
         closeContextMenu() {
             // Закрываем контекстное меню при клике вне него
-            this.menu.contextMenuVisible = false;
+            // в ElementMenuComponent у тегов есть атрибут tag-type, по нему и смотреть 
+            const customAttribute = event.target.getAttribute('tag-type');
+            if (customAttribute !== 'el-menu') {
+                this.menu.contextMenuVisible = false;
+                window.removeEventListener('click', this.closeContextMenu);
+            }
+
         },
     },
-    created(){
+    created() {
         this.EditedData = this.getData
     },
 

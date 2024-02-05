@@ -23,8 +23,8 @@ const store = createStore({
         height: 70,
         text_: "простой блок",
         hasFill: true,
-        borderColor: "hsl( 0, 100%, 50% )",
-        fillColor: "hsl( 0, 100%, 75% )",
+        borderColor: "#0500ff",
+        fillColor: "#0500ff80",
       });
     },
     setFocusElement(state, index){

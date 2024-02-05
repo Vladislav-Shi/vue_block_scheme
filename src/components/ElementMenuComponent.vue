@@ -1,12 +1,14 @@
 <template>
-    <div class="context-menu" :style="dynamicMenu">
-        <ul class="list-group">
-            <button class="list-group-item list-group-item-action">Удалить блок</button>
-            <button class="list-group-item list-group-item-action">Копировать</button>
-            <label class="list-group-item">
-                <input class="form-check-input" type="checkbox" v-model="EditedData.hasFill" @change="ChangeFill"> Есть заливка
+    <div class="context-menu" tag-type="el-menu" :style="dynamicMenu">
+        <ul class="list-group" tag-type="el-menu">
+            <button class="list-group-item list-group-item-action" tag-type="el-menu">Удалить блок</button>
+            <button class="list-group-item list-group-item-action" tag-type="el-menu">Копировать</button>
+            <label class="list-group-item" tag-type="el-menu">
+                <input class="form-check-input" tag-type="el-menu" type="checkbox" v-model="EditedData.hasFill" @change="ChangeFill"> Есть заливка
             </label>
-            <button class="list-group-item list-group-item-action" @click="chooseColor">Выбрать цвет</button>
+            <label class="list-group-item" tag-type="el-menu">
+                <input type="color" class="form-control form-control-sm form-control-color"  tag-type="el-menu" v-model="EditedData.borderColor" @change="ChangeColor">Выбрать цвет
+            </label>
         </ul>
     </div>
 </template>
@@ -44,6 +46,10 @@ export default {
         ChangeFill(){
             // Меняет режим заливки
             console.log('ChangeFill')
+            this.saveChanges()
+        },
+        ChangeColor(){
+            this.EditedData.fillColor = this.EditedData.borderColor + '80'
             this.saveChanges()
         }
 
